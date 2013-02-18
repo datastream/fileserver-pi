@@ -8,7 +8,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 )
 
@@ -60,18 +59,11 @@ func write_file(part *multipart.Part) error {
 			return err
 		}
 	}
-	i := 0
-	var err error
-	for {
-		if _, err = os.Stat(file_name); err != nil {
-			if os.IsNotExist(err) {
-				break
-			}
-		} else {
-			file_name += "." + strconv.Itoa(i)
-		}
-		i++
+	if fd, err := os.Open(file_name); err == nil {
+		fd.Close()
+		return nil
 	}
+	var err error
 	var newfile *os.File
 	if newfile, err = os.Create(file_name); err != nil {
 		return err
